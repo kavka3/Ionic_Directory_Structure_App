@@ -1,0 +1,72 @@
+<!--<div>-->
+
+    <!--<div class="item item-avatar" ng-repeat="activity in activities | orderBy:'created'">-->
+        <!--<img ng-src="{{ activity.imageUrl }}">-->
+        <!--<h2>{{ activity.title }}</h2>-->
+        <!--<p>{{ activity.description }}</p>-->
+    <!--</div>-->
+<!--</div>-->
+
+<td-cards>
+    <td-card ng-repeat="activity in activities | orderBy:'created'"
+             on-destroy="cardDestroyed($index)"
+             on-swipe-left="cardSwipedLeft($index)"
+             on-swipe-right="cardSwipedRight($index,activity._id)"
+             on-partial-swipe="cardPartialSwipe(amt)"
+             class="card-{{$index}}">
+
+        <a class="item item-avatar item-header" href="#" ng-click="openActivity(activity._id)" >
+            <img ng-src="{{ activity.creator.imageUrl }}">
+            <h2 class="center">{{activity.title}}</h2>
+        </a>
+
+        <!--<a class="item item-avatar item-header item-card" href="#">-->
+            <!--<img ng-src={{card.creator.imageUrl}}>-->
+            <!--<h2 class="center">{{card.title}}</h2>-->
+        <!--</a>-->
+
+        <div class="image">
+            <div class="no-text1 overlayBox"><div class="noBox boxed">Trash</div></div>
+            <div class="image-container center">
+                <img ng-src="{{activity.imageUrl}}">
+                <p class="padding card-tags-label">
+                    <a href="#" class="button button-dark button-small item tag" ng-repeat="tag in activity.tags" ng-value="tag" >{{ tag.name }}</a>
+                </p>
+            </div>
+            <div class="yes-text1 overlayBox"><div class="yesBox boxed" id="centerMe">Save</div></div>
+        </div>
+
+        <div class="info-tabs-responsive">
+            <div class="col info-tabs padding dark">
+                <i class="icon  dark icon-custom-clock placeholder-icon"></i>
+                <span class="span-responsive">Starts tmr</span>
+                <span class="span-smaller-responsive">18:00</span>
+            </div>
+            <div class="col info-tabs padding dark">
+                <i class="icon dark ion-navigate placeholder-icon"></i>
+                100km<span class="span-responsive"> away</span>
+            </div>
+            <div class="col info-tabs padding dark">
+                <i class="icon dark icon-custom-friend placeholder-icon"></i>
+                <span class="span-responsive">{{activity.joinedUsers.length>1 ? activity.joinedUsers.length + " people are going" : +"1 person is going"}}</span>
+                <span class="span-smaller-responsive">{{activity.joinedUsers.length}}</span>
+            </div>
+        </div>
+        <!--<button ng-click="openActivity(activity._id)">open a</button>-->
+
+    </td-card>
+
+    <div class="row card-buttons" ng-if="activities.length">
+        <div class="col center">
+            <div class="row">
+                <div class="col">
+                    <button class="button card-button-out" ng-class='{"on":btnOut,"off":!btnOut }' on-release="btnOut=!btnOut" on-touch="btnOut=!btnOut" ng-click=""></button>
+                </div>
+                <div class="col">
+                    <button class="button card-button-in" ng-class='{"on":btnIn,"off":!btnIn }' on-release="btnIn=!btnIn" on-touch="btnIn=!btnIn" ng-click=""></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</td-cards>
