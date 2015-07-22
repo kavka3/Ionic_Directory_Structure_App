@@ -8,7 +8,7 @@
 <!--</div>-->
 
 <td-cards>
-    <td-card ng-repeat="activity in activities | orderBy:'created'"
+    <td-card ng-repeat="activity in dataCore | orderBy:'created'"
              on-destroy="cardDestroyed($index)"
              on-swipe-left="cardSwipedLeft($index)"
              on-swipe-right="cardSwipedRight($index,activity._id)"
@@ -19,11 +19,6 @@
             <img ng-src="{{ activity.creator.imageUrl }}">
             <h2 class="center">{{activity.title}}</h2>
         </a>
-
-        <!--<a class="item item-avatar item-header item-card" href="#">-->
-            <!--<img ng-src={{card.creator.imageUrl}}>-->
-            <!--<h2 class="center">{{card.title}}</h2>-->
-        <!--</a>-->
 
         <div class="image">
             <div class="no-text1 overlayBox"><div class="noBox boxed">Trash</div></div>

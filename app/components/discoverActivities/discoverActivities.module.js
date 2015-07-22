@@ -17,6 +17,8 @@ angular.module('discoverActivities', ['ionic.contrib.ui.tinderCards'])
             'templateUrl':'./app/components/discoverActivities/discoverActivities.view.html',
             'link':function(scope,element,attrs,dataCtrl){
 
+               // scope.init(dataCtrl);
+
                 dataCtrl.items.then(function(data){
                     scope.init(data.data.data);
                 });
@@ -37,18 +39,15 @@ angular.module('discoverActivities', ['ionic.contrib.ui.tinderCards'])
     })
     .controller('discoverController',['$scope',function($scope){
 
-        $scope.init= function (activities) {
-
-            console.log(activities)
-            //var deferred = $q.defer();
-
-            $scope.activities=activities;
-            $scope.activities.splice(5, 38);
+        $scope.init= function (dataCore) {
+            console.log('discoverActivities component init',dataCore);
+            $scope.dataCore=dataCore;
+            //$scope.activities=activities;
+            //$scope.activities.splice(5, 38);
         };
 
         $scope.cardSwipedLeft= function(index) {
             console.log("card "+index+" swiped left ");
-            //$scope.addCard();
         };
 
         $scope.cardSwipedRight= function(index,id) {
@@ -56,15 +55,9 @@ angular.module('discoverActivities', ['ionic.contrib.ui.tinderCards'])
         };
 
         $scope.cardDestroyed = function(index) {
-            $scope.activities.splice(index, 1);
+            $scope.activities.slice(index, 1);
             console.log("activities", $scope.activities);
         };
-
-        //$scope.addCard = function() {
-        //    var newCard = cardTypes[Math.floor(Math.random() * cardTypes.length)];
-        //    newCard.id = Math.random();
-        //    $scope.cards.push(angular.extend({}, newCard));
-        //};
 
         $scope.openActivity=function(id){
             $scope.onactivitydetail({id:id});

@@ -3,7 +3,7 @@
  */
 
 require('./shared/config/config.module.js');
-require('./components/activity/activity.module.js');
+require('./components/activityDetails/activityDetails.module.js');
 require('./components/discoverActivities/discoverActivities.module.js');
 require('./components/dataCore/dataCore.module.js');
 require('./components/main/main.module.js');

@@ -17,25 +17,27 @@ angular.module('main', ['dataCore'])
                 scope.init();
             }
         }
-
     })
     .controller('mainController',['$scope',function($scope){
+
+        $scope.showDetails=false;
 
         $scope.init= function () {
             console.log('main component init');
         };
 
         $scope.ondiscoveractivitiesinit=function(discoverActivities){
-            console.log("discover activities init");
+            console.log("discoverActivities init in MAIN");
             $scope.discoverActivities=discoverActivities;
         }
 
         $scope.onactivitydetailsinit=function(activityDetails){
-            console.log("activity details init");
+            console.log("activityDetails init in MAIN");
             $scope.activityDetails=activityDetails;
         }
 
         $scope.onactivitydetail=function(id){
+            $scope.showDetails=true;
             $scope.activityDetails.loadactivity(id);
         }
 
