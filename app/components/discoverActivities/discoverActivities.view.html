@@ -8,14 +8,14 @@
 <!--</div>-->
 
 <td-cards>
-    <td-card ng-repeat="activity in dataCore | orderBy:'created'"
+    <td-card ng-repeat="activity in dataCore.items | orderBy:'created'"
              on-destroy="cardDestroyed($index)"
              on-swipe-left="cardSwipedLeft($index)"
              on-swipe-right="cardSwipedRight($index,activity._id)"
              on-partial-swipe="cardPartialSwipe(amt)"
              class="card-{{$index}}">
 
-        <a class="item item-avatar item-header" href="#" ng-click="openActivity(activity._id)" >
+        <a class="item item-avatar item-header" href="#" ng-click="openActivity(activity)" >
             <img ng-src="{{ activity.creator.imageUrl }}">
             <h2 class="center">{{activity.title}}</h2>
         </a>

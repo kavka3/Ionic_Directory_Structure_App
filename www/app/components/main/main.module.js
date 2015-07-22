@@ -36,9 +36,9 @@ angular.module('main', ['dataCore'])
             $scope.activityDetails=activityDetails;
         }
 
-        $scope.onactivitydetail=function(id){
+        $scope.onactivitydetail=function(activity){
             $scope.showDetails=true;
-            $scope.activityDetails.loadactivity(id);
+            $scope.activityDetails.loadactivity(activity);
         }
 
     }]);

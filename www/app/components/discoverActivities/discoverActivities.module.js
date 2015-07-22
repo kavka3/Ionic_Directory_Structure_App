@@ -17,11 +17,11 @@ angular.module('discoverActivities', ['ionic.contrib.ui.tinderCards'])
             'templateUrl':'./app/components/discoverActivities/discoverActivities.view.html',
             'link':function(scope,element,attrs,dataCtrl){
 
-               // scope.init(dataCtrl);
+                scope.init(dataCtrl);
 
-                dataCtrl.items.then(function(data){
-                    scope.init(data.data.data);
-                });
+                //dataCtrl.items.then(function(data){
+                //    scope.init(data.data.data);
+                //});
 
                 //dataCtrl.getActivities()
                 //    .success(function(response){
@@ -55,12 +55,14 @@ angular.module('discoverActivities', ['ionic.contrib.ui.tinderCards'])
         };
 
         $scope.cardDestroyed = function(index) {
-            $scope.activities.slice(index, 1);
-            console.log("activities", $scope.activities);
+            console.log("index",index);
+            console.log("before slice", $scope.dataCore.items);
+            $scope.dataCore.items.slice(index, 1);
+            console.log("after slice", $scope.dataCore.items);
         };
 
-        $scope.openActivity=function(id){
-            $scope.onactivitydetail({id:id});
+        $scope.openActivity=function(activity){
+            $scope.onactivitydetail({activity:activity});
         };
 
     }]);
