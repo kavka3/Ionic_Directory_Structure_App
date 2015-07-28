@@ -18,24 +18,55 @@ angular.module('dataCore', ['discoverActivities','activityDetails'])
             }
         })
     .controller('dataController',['$scope','$http','config','$q',function($scope,$http,config,$q){
-            var self=this;
-            this.items=[];
+        var self=this;
+        this.items=[];
+        self.currentActivities={items:[]};
 
-            $scope.init= function () {
-                console.log('dataCore component init');
+        $scope.init= function () {
+            console.log('dataCore component init');
 
-                $http.get(config.developmentDbUrl+'activity_un_search')
-                    .success(function(data, status, headers, config) {
-                        console.log("dataCore: success get all activities", data);
-                        self.items=data.data;
-                    })
-                    .error(function(data, status, headers, config) {
-                        console.log("error get all activities")
-                    });
+            $http.get(config.developmentDbUrl+'activity_un_search')
+                .success(function(data, status, headers, config) {
+                    console.log("dataCore: success get all activities", data);
+                    self.items= _.first(data.data,3);//  data.data;
+                    //self.loadNext();
+                })
+                .error(function(data, status, headers, config) {
+                    console.log("error get all activities")
+                });
+        };
 
+        this.slice=function(index){
+            self.items.slice(index,1);
+        }
 
-                //return q.promise();
-            };
+        //this.loadNext=function(){
+        //
+        //    if(_.isEmpty(self.currentActivities.index)){
+        //        if(self.items.length>5)
+        //        {
+        //            self.items.find(function(e,i,arr){
+        //                if(i<5)
+        //                    self.currentActivities.items.push(e);
+        //            });
+        //        }
+        //        else
+        //        {
+        //            self.currentActivities=self.items;
+        //        }
+        //        self.currentActivities.index=0;
+        //    }
+        //    else{
+        //        self.currentActivities=[];
+        //        var cnt=0;
+        //        self.items.find(function(e,i,arr){
+        //            if(self.currentActivities.index<i && cnt<5){
+        //                self.currentActivities.items.push(e);
+        //                cnt++;
+        //            }
+        //        });
+        //    }
+        //}
 
             //this.items = $http.get(config.developmentDbUrl+'activity_un_search')
             //    .success(function(data, status, headers, config) {

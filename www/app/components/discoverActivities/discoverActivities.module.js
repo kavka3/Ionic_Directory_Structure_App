@@ -39,6 +39,8 @@ angular.module('discoverActivities', ['ionic.contrib.ui.tinderCards'])
     })
     .controller('discoverController',['$scope',function($scope){
 
+        $scope.activities=[];
+
         $scope.init= function (dataCore) {
             console.log('discoverActivities component init',dataCore);
             $scope.dataCore=dataCore;
@@ -55,10 +57,17 @@ angular.module('discoverActivities', ['ionic.contrib.ui.tinderCards'])
         };
 
         $scope.cardDestroyed = function(index) {
-            console.log("index",index);
-            console.log("before slice", $scope.dataCore.items);
-            $scope.dataCore.items.slice(index, 1);
-            console.log("after slice", $scope.dataCore.items);
+
+            if (index==1){
+               // $scope.dataCore.loadNext();
+            }
+
+
+            //console.log("index",index);
+            //console.log("before slice", $scope.dataCore.items);
+            //$scope.dataCore.items.splice(index, 1);
+            ////$scope.dataCore.splice(index);
+            //console.log("after slice", $scope.dataCore.items);
         };
 
         $scope.openActivity=function(activity){

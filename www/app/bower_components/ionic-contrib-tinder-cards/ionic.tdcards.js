@@ -3,7 +3,7 @@
   // Get transform origin poly
   var d = document.createElement('div');
   var transformKeys = ['webkitTransformOrigin', 'transform-origin', '-webkit-transform-origin', 'webkit-transform-origin',
-              '-moz-transform-origin', 'moz-transform-origin', 'MozTransformOrigin', 'mozTransformOrigin'];
+    '-moz-transform-origin', 'moz-transform-origin', 'MozTransformOrigin', 'mozTransformOrigin'];
 
   var TRANSFORM_ORIGIN = 'webkitTransformOrigin';
   for(var i = 0; i < transformKeys.length; i++) {
@@ -14,7 +14,7 @@
   }
 
   var transitionKeys = ['webkitTransition', 'transition', '-webkit-transition', 'webkit-transition',
-              '-moz-transition', 'moz-transition', 'MozTransition', 'mozTransition'];
+    '-moz-transition', 'moz-transition', 'MozTransition', 'mozTransition'];
   var TRANSITION = 'webkitTransition';
   for(var i = 0; i < transitionKeys.length; i++) {
     if(d.style[transitionKeys[i]] !== undefined) {
@@ -116,13 +116,6 @@
     swipe: function() {
       this.transitionOut();
     },
-    
-    /**
-     * Snap the card back to its original position
-     */
-    snapBack: function() {
-      this.onSnapBack(this.x, this.y, this.rotationAngle);
-    },
 
     isUnderThreshold: function() {
       //return true;
@@ -139,9 +132,8 @@
         return;
       }
 
-      self.onTransitionOut(self.thresholdAmount);
-      
       var angle = Math.atan(e.gesture.deltaX / e.gesture.deltaY);
+      console.log('Finishing at angle', angle, 'and velocity', e.gesture.velocityX, e.gesture.velocityY);
 
       var dir = this.thresholdAmount < 0 ? -1 : 1;
       var targetX;
@@ -158,11 +150,15 @@
       var rotateTo = this.rotationAngle;//(this.rotationAngle this.rotationDirection * 0.2));// || (Math.random() * 0.4);
 
       var duration = 0.3 - Math.min(Math.max(Math.abs(e.gesture.velocityX)/10, 0.05), 0.2);
-      
+
+      //console.log(e.gesture.velocityX/2, duration);
+      console.log('Duration', duration);
+
       ionic.requestAnimationFrame(function() {
         self.el.style.transform = self.el.style.webkitTransform = 'translate3d(' + targetX + 'px, ' + targetY + 'px,0) rotate(' + self.rotationAngle + 'rad)';
         self.el.style.transition = self.el.style.webkitTransition = 'all ' + duration + 's ease-in-out';
       });
+      console.log('DO DRAG END');
 
       //this.onSwipe && this.onSwipe();
 
@@ -179,20 +175,19 @@
       var self = this;
       ionic.onGesture('dragstart', function(e) {
         /*
-        var cx = window.innerWidth / 2;
-        if(e.gesture.touches[0].pageX < cx) {
-          self._transformOriginRight();
-        } else {
-          self._transformOriginLeft();
-        }
-        */
+         var cx = window.innerWidth / 2;
+         if(e.gesture.touches[0].pageX < cx) {
+         self._transformOriginRight();
+         } else {
+         self._transformOriginLeft();
+         }
+         */
+        console.log('DRAG START');
         ionic.requestAnimationFrame(function() { self._doDragStart(e) });
       }, this.el);
 
       ionic.onGesture('drag', function(e) {
         ionic.requestAnimationFrame(function() { self._doDrag(e) });
-        // Indicate we want to stop parents from using this
-        e.gesture.srcEvent.preventDefault();
       }, this.el);
 
       ionic.onGesture('dragend', function(e) {
@@ -216,6 +211,7 @@
       var width = this.el.offsetWidth;
       var point = window.innerWidth / 2 + this.rotationDirection * (width / 2)
       var distance = Math.abs(point - e.gesture.touches[0].pageX);// - window.innerWidth/2);
+      console.log(distance);
 
       this.touchDistance = distance * 10;
     },
@@ -248,208 +244,163 @@
 
   angular.module('ionic.contrib.ui.tinderCards', ['ionic'])
 
-  .directive('tdCard', ['$timeout', function($timeout) {
-    /**
-     * A simple non-linear fade function for the text on each card
-     */
-    var fadeFn = function(t) {
-      // Speed up time to ramp up quickly
-      t = Math.min(1, t * 3);
+      .directive('tdCard', ['$timeout', function($timeout) {
+        return {
+          restrict: 'E',
+          template: '<div class="swipe-card" ng-transclude></div>',
+          require: '^tdCards',
+          transclude: true,
+          scope: {
+            onSwipeLeft: '&',
+            onSwipeRipe: '&',
+            onPartialSwipe: '&',
+            onSnapBack: '&',
+            onDestroy: '&'
+          },
+          compile: function(element, attr) {
+            return function($scope, $element, $attr, swipeCards) {
+              var el = $element[0];
 
-      // This is a simple cubic bezier curve.
-      // http://cubic-bezier.com/#.11,.67,.41,.99
-      var c1 = 0.11,
-          c2 = 0.67,
-          c3 = 0.41,
-          c4 = 0.99;
+              // Instantiate our card view
+              var swipeableCard = new SwipeableCardView({
+                el: el,
+                onPartialSwipe: function(amt) {
+                  swipeCards.partial(amt);
+                  $timeout(function() {
+                    $scope.leftTextOpacity = {
+                      'opacity': amt > 0 ? amt : 0
+                    };
+                    $scope.rightTextOpacity = {
+                      'opacity': amt < 0 ? Math.abs(amt) : 0
+                    };
 
-      return Math.pow((1 - t), 3)*c1 + 3*Math.pow((1 -  t), 2)*t*c2 + 3*(1 - t)*t*t*c3 + Math.pow(t, 3)*c4;
-    };
+                    $scope.onPartialSwipe({amt: amt});
+                  });
+                },
+                onSwipeRight: function() {
+                  $timeout(function() {
+                    $scope.onSwipeRight();
+                  });
+                },
+                onSwipeLeft: function() {
+                  $timeout(function() {
+                    $scope.onSwipeLeft();
+                  });
+                },
+                onDestroy: function() {
+                  $timeout(function() {
+                    $scope.onDestroy();
+                  });
+                },
+                onSnapBack: function(startX, startY, startRotation) {
+                  var leftText = el.querySelector('.yes-text');
+                  var rightText = el.querySelector('.no-text');
 
-    return {
-      restrict: 'E',
-      template: '<div class="td-card" ng-transclude></div>',
-      require: '^tdCards',
-      transclude: true,
-      scope: {
-        onSwipeLeft: '&',
-        onSwipeRight: '&',
-        onTransitionLeft: '&',
-        onTransitionRight: '&',
-        onTransitionOut: '&',
-        onPartialSwipe: '&',
-        onSnapBack: '&',
-        onDestroy: '&'
-      },
-      compile: function(element, attr) {
-        return function($scope, $element, $attr, swipeCards) {
-          var el = $element[0];
-          var leftText = el.querySelector('.no-text');
-          var rightText = el.querySelector('.yes-text');
-          
-          // Force hardware acceleration for animation - better performance on first touch
-          el.style.transform = el.style.webkitTransform = 'translate3d(0px, 0px, 0px)';
+                  var animation = collide.animation({
+                    // 'linear|ease|ease-in|ease-out|ease-in-out|cubic-bezer(x1,y1,x2,y2)',
+                    // or function(t, duration),
+                    // or a dynamics configuration (see below)
+                    duration: 500,
+                    percent: 0,
+                    reverse: false
+                  })
 
-          // Instantiate our card view
-          var swipeableCard = new SwipeableCardView({
-            el: el,
-            leftText: leftText,
-            rightText: rightText,
-            onPartialSwipe: function(amt) {
-              swipeCards.partial(amt);
-              var self = this;
-              $timeout(function() {
-                if (amt < 0) {
-                  if (self.leftText) self.leftText.style.opacity = fadeFn(-amt);
-                  if (self.rightText) self.rightText.style.opacity = 0;
-                } else {
-                  if (self.leftText) self.leftText.style.opacity = 0;
-                  if (self.rightText) self.rightText.style.opacity = fadeFn(amt);
-                }
-                $scope.onPartialSwipe({amt: amt});
+                      .easing({
+                        type: 'spring',
+                        frequency: 15,
+                        friction: 250,
+                        initialForce: false
+                      })
+
+                      .on('step', function(v) {
+                        //Have the element spring over 400px
+                        el.style.transform = el.style.webkitTransform = 'translate3d(' + (startX - startX*v) + 'px, ' + (startY - startY*v) + 'px, 0) rotate(' + (startRotation - startRotation*v) + 'rad)';
+                        rightText.style.opacity = Math.max(rightText.style.opacity - rightText.style.opacity * v, 0);
+                        leftText.style.opacity = Math.max(leftText.style.opacity - leftText.style.opacity * v, 0);
+                      })
+                      .start();
+                  /*
+                   animateSpringViaCss(el, 0, 0.5, 50, 700, 10, function (x) {
+                   console.log('Mapper', x);
+                   return el.style.transform = el.style.webkitTransform = 'translate3d(' + x + 'px,0,0)';
+                   });
+                   */
+                },
               });
-            },
-            onSwipeRight: function() {
-              $timeout(function() {
-                $scope.onSwipeRight();
-              });
-            },
-            onSwipeLeft: function() {
-              $timeout(function() {
-                $scope.onSwipeLeft();
-              });
-            },
-            onTransitionRight: function() {
-              $timeout(function() {
-                $scope.onTransitionRight();
-              });
-            },
-            onTransitionLeft: function() {
-              $timeout(function() {
-                $scope.onTransitionLeft();
-              });
-            },
-            onTransitionOut: function(amt) {
-              if (amt < 0) {
-                swipeableCard.onTransitionLeft();
-              } else {
-                swipeableCard.onTransitionRight();
-              }
-              $timeout(function() {
-                $scope.onTransitionOut({amt: amt});
-              });
-            },
-            onDestroy: function() {
-              $timeout(function() {
-                $scope.onDestroy();
-              });
-            },
-            onSnapBack: function(startX, startY, startRotation) {
-              var leftText = el.querySelector('.yes-text');
-              var rightText = el.querySelector('.no-text');
+              $scope.$parent.swipeCard = swipeableCard;
 
-              var animation = collide.animation({
-                // 'linear|ease|ease-in|ease-out|ease-in-out|cubic-bezer(x1,y1,x2,y2)',
-                // or function(t, duration),
-                // or a dynamics configuration (see below)
-                duration: 500,
-                percent: 0,
-                reverse: false
-              })
-
-              .easing({
-                type: 'spring',
-                frequency: 15,
-                friction: 250,
-                initialForce: false
-              }) 
-
-              .on('step', function(v) {
-                //Have the element spring over 400px
-                el.style.transform = el.style.webkitTransform = 'translate3d(' + (startX - startX*v) + 'px, ' + (startY - startY*v) + 'px, 0) rotate(' + (startRotation - startRotation*v) + 'rad)';
-                if (rightText) rightText.style.opacity = 0;
-                if (leftText) leftText.style.opacity = 0;
-              })
-              .start();
-
-              $timeout(function() {
-                $scope.onSnapBack();
-              });
-
-              /*
-              animateSpringViaCss(el, 0, 0.5, 50, 700, 10, function (x) {
-                return el.style.transform = el.style.webkitTransform = 'translate3d(' + x + 'px,0,0)';
-              });
-              */
-            },
-          });
-          $scope.$parent.swipeCard = swipeableCard;
-
-        }
-      }
-    }
-  }])
-
-  .directive('tdCards', ['$rootScope', '$timeout', function($rootScope, $timeout) {
-    return {
-      restrict: 'E',
-      template: '<div class="td-cards" ng-transclude></div>',
-      transclude: true,
-      scope: {},
-      controller: ['$scope', '$element', function($scope, $element) {
-        var cards;
-        var firstCard, secondCard, thirdCard;
-
-        var existingCards, card;
-
-        var i, j;
-
-        var sortCards = function() {
-          existingCards = $element[0].querySelectorAll('td-card');
-
-          for(i = 0; i < existingCards.length; i++) {
-            card = existingCards[i];
-            if(!card) continue;
-            if(i > 0) {
-              card.style.transform = card.style.webkitTransform = 'translate3d(0, ' + (i * 4) + 'px, 0)';
             }
-            card.style.zIndex = (existingCards.length - i);
           }
-        };
+        }
+      }])
 
-        $timeout(function() {
-          sortCards();
-        });
+      .directive('tdCards', ['$rootScope', '$timeout', function($rootScope, $timeout) {
+        return {
+          restrict: 'E',
+          template: '<div class="td-cards" ng-transclude></div>',
+          transclude: true,
+          scope: {},
+          controller: function($scope, $element) {
+            var cards;
+            var firstCard, secondCard, thirdCard;
 
-        var bringCardUp = function(card, amt, max) {
-          var position, newTop;
-          position = card.style.transform || card.style.webkitTransform;
-          newTop = Math.max(0, Math.min(max, max - (max * Math.abs(amt))));
-          card.style.transform = card.style.webkitTransform = 'translate3d(0, ' + newTop + 'px, 0)';
-        };
+            var existingCards, card;
 
-        this.partial = function(amt) {
-          cards = $element[0].querySelectorAll('td-card');
-          firstCard = cards[0];
-          secondCard = cards.length > 2 && cards[1];
-          thirdCard = cards.length > 3 && cards[2];
+            var i, j;
 
-          secondCard && bringCardUp(secondCard, amt, 4);
-          thirdCard && bringCardUp(thirdCard, amt, 8);
-        };
-      }]
-    }
-  }])
+            var sortCards = function() {
+              existingCards = $element[0].querySelectorAll('td-card');
+              console.log('Existing', existingCards);
 
-  .factory('TDCardDelegate', ['$rootScope', function($rootScope) {
-    return {
-      popCard: function($scope, isAnimated) {
-        $rootScope.$emit('tdCard.pop', isAnimated);
-      },
-      getSwipeableCard: function($scope) {
-        return $scope.swipeCard;
-      }
-    }
-  }]);
+              for(i = 0; i < existingCards.length; i++) {
+                card = existingCards[i];
+                if(!card) continue;
+                if(i > 0) {
+                  card.style.transform = card.style.webkitTransform = 'translate3d(0, ' + (i * 4) + 'px, 0)';
+                }
+                card.style.zIndex = (existingCards.length - i);
+              }
+            };
+
+            $timeout(function() {
+              sortCards();
+            });
+
+            var bringCardUp = function(card, amt, max) {
+              var position, top, newTop;
+              position = card.style.transform || card.style.webkitTransform;
+              top = parseInt(position && position.split(',')[1] || 0);
+              //console.log(window.getComputedStyle(secondCard));
+              newTop = Math.max(0, Math.min(max, max - (max * Math.abs(amt))));
+              //console.log(top);
+              console.log(newTop);
+              card.style.transform = card.style.webkitTransform = 'translate3d(0, ' + newTop + 'px, 0)';
+            };
+
+            this.partial = function(amt) {
+              cards = $element[0].querySelectorAll('td-card');
+              firstCard = cards[0];
+              secondCard = cards[1];
+              thirdCard = cards[2];
+              if(!secondCard) { return; }
+
+              bringCardUp(secondCard, amt, 4);
+              bringCardUp(thirdCard, amt, 8);
+              //console.log('Partial with', top);
+            };
+          }
+        }
+      }])
+
+      .factory('TDCardDelegate', ['$rootScope', function($rootScope) {
+        return {
+          popCard: function($scope, isAnimated) {
+            $rootScope.$emit('tdCard.pop', isAnimated);
+          },
+          getSwipebleCard: function($scope) {
+            return $scope.$parent.swipeCard;
+          }
+        }
+      }]);
 
 })(window.ionic);
