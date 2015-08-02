@@ -70,7 +70,7 @@ gulp.task('clean', function() {
 gulp.task('connect', function () {
     connect.server({
         root: 'www',
-        port: 11000
+        port: 12000
     });
 });
 

@@ -8,7 +8,7 @@
 <!--</div>-->
 
 <td-cards>
-    <td-card ng-repeat="activity in dataCore.items | orderBy:'created'"
+    <td-card ng-repeat="activity in dataCore.currentActivities.items"
              on-destroy="cardDestroyed($index)"
              on-swipe-left="cardSwipedLeft($index)"
              on-swipe-right="cardSwipedRight($index,activity._id)"

@@ -16,22 +16,7 @@ angular.module('discoverActivities', ['ionic.contrib.ui.tinderCards'])
             'controller':'discoverController',
             'templateUrl':'./app/components/discoverActivities/discoverActivities.view.html',
             'link':function(scope,element,attrs,dataCtrl){
-
                 scope.init(dataCtrl);
-
-                //dataCtrl.items.then(function(data){
-                //    scope.init(data.data.data);
-                //});
-
-                //dataCtrl.getActivities()
-                //    .success(function(response){
-                //        console.log("discoverActivities: success get all activities", response);
-                //        scope.init(response.data);
-                //    })
-                //    .error(function(response){
-                //        console.log("discoverActivities: error get all activities", response);
-                //    });
-
                 scope.ondiscoveractivitiesinit({scope:scope});
             }
         }
@@ -58,9 +43,15 @@ angular.module('discoverActivities', ['ionic.contrib.ui.tinderCards'])
 
         $scope.cardDestroyed = function(index) {
 
+            //$scope.dataCore.items.splice(index,1);
+
+            $scope.dataCore.currentActivities.items.splice(index,1);
+
             if (index==1){
-               // $scope.dataCore.loadNext();
+                $scope.dataCore.loadNext();
             }
+
+
 
 
             //console.log("index",index);

@@ -14,12 +14,15 @@
     <link href="css/ionic.app.css" rel="stylesheet">
     -->
 
+
+
     <!-- ionic/angularjs js -->
     <script src="lib/ionic/js/ionic.bundle.js"></script>
 
     <!-- cordova script (this will be a 404 during development) -->
     <script src="cordova.js"></script>
 
+    <script src="js/moment-with-locales/moment-with-locales.js"></script>
     <!-- your app's js -->
     <!--<script src="app/app.module.js"></script>-->
     <script src="app/bundled.js"></script>
@@ -27,12 +30,22 @@
   </head>
   <body ng-app="starter">
 
+
     <ion-pane>
       <ion-header-bar class="bar-stable">
         <h1 class="title">Ionic Blank Starter</h1>
       </ion-header-bar>
       <!--<ion-content>-->
+
+    <!--<ion-nav-bar id="main" class="bar-light">-->
+      <!--<ion-nav-back-button class="button-clear">-->
+        <!--<i class="ion-chevron-left"></i>-->
+      <!--</ion-nav-back-button>-->
+    <!--</ion-nav-bar>-->
+
+    <!--<ion-nav-view drag-content="false">-->
         <main></main>
+    <!--</ion-nav-view>-->
       <!--</ion-content>-->
     </ion-pane>
   </body>
